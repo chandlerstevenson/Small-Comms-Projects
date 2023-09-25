@@ -1,5 +1,3 @@
-
-% ENGN1932M Exercise 1 
 % Chandler W. Stevenson
 
 % Top Level Environment: Constants
@@ -28,7 +26,7 @@ letter_d = [941, 1633];
 
 
 % Define the phone number sequence
-phone_number = {four, zero, one, nine, five, seven, four, two, six, nine};  % Use a cell array for the phone_number to store each tone
+phone_number = {four, zero, zero, nine, five, seven, four, two, six, nine};  % Use a cell array for the phone_number to store each tone
 
 % Here, we define a cut off value which is simply the length of the phone
 % number 
@@ -85,7 +83,7 @@ function decoded_number = decode_signal(signal)
     noverlap = round(0.0001*Fs);   % Minimal overlap
     [S,F,T,P] = spectrogram(signal, windowSize, noverlap, [], Fs);
 
-    % Plot the spectrogram for visual inspection
+    % Plot the spectrogram for visual purposes 
     imagesc(T,F,10*log10(abs(P)));
     axis xy;
     xlabel('Time (s)');
@@ -94,7 +92,7 @@ function decoded_number = decode_signal(signal)
     colorbar;
     
     % Set y-axis limits
-    ylim([0 2000]);
+    ylim([0 2000]); % can be adjusted if not for DTMF utility 
 
     phone_number = {};
 
@@ -102,11 +100,9 @@ function decoded_number = decode_signal(signal)
         % Identify the dominant frequencies for each time segment
         [~,I] = findpeaks(P(:,i), 'SortStr', 'descend', 'NPeaks', 2);
         
-        % If two peaks are found
+        % If two peaks are found (not in grey zone) 
         if length(I) == 2 
-            ...
-    
-            dominantFreq = sort(F(I(1:2)));  % Sort the frequencies
+            dominantFreq = sort(F(I(1:2)));  % Sort the frequencies, follows from table 
             dominantFreq1 = dominantFreq(1);
             dominantFreq2 = dominantFreq(2);
             
@@ -118,8 +114,7 @@ function decoded_number = decode_signal(signal)
         end
     end
 
-    % Removing repeated characters due to overlap
-    decoded_number = unique(phone_number, 'stable');
+    decoded_number = phone_number
 end
 
 
@@ -129,17 +124,19 @@ function number = map_frequencies_to_number(f1, f2)
     row_freqs = [697, 770, 852, 941];
     col_freqs = [1209, 1336, 1477, 1633];
 
-    tolerance = 10;  % Let's allow a 10Hz tolerance
+    tolerance = 10;  % Values can fall within +/- tolerance 
     
     % Find the closest frequency within the tolerance range for f1 and f2
     [~, row_idx] = min(abs(row_freqs - f1));
     [~, col_idx] = min(abs(col_freqs - f2));
 
+    % Define Grey Areas for 
     if abs(row_freqs(row_idx) - f1) > tolerance
         number = 'X';  % Frequency f1 was not close enough
         return;
     end
-
+    
+  
     if abs(col_freqs(col_idx) - f2) > tolerance
         number = 'X';  % Frequency f2 was not close enough
         return;
