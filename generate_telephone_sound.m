@@ -1,3 +1,5 @@
+
+% ENGN1932M Exercise 1 with Extra Credit 
 % Chandler W. Stevenson
 
 % Top Level Environment: Constants
@@ -21,12 +23,13 @@ nine = [852, 1477];
 letter_c = [852, 1633];  
 star = [941, 1209];  
 zero = [941, 1336];  
-pound = [941, 1447]; 
+pound = [941, 1477]; 
 letter_d = [941, 1633];   
 
 
 % Define the phone number sequence
-phone_number = {four, zero, zero, nine, five, seven, four, two, six, nine};  % Use a cell array for the phone_number to store each tone
+phone_number = {zero, one, two, three, four, five, six, seven, eight, nine, letter_a, letter_b, letter_c,...
+    letter_d, star, pound};  % Use a cell array for the phone_number to store each tone
 
 % Here, we define a cut off value which is simply the length of the phone
 % number 
@@ -80,7 +83,7 @@ function decoded_number = decode_signal(signal)
 
     % Segment the signal using STFT
     windowSize = round(0.3*Fs);  % Using entire tone duration
-    noverlap = round(0.0001*Fs);   % Minimal overlap
+    noverlap = round(0.00001*Fs);   % Minimal overlap
     [S,F,T,P] = spectrogram(signal, windowSize, noverlap, [], Fs);
 
     % Plot the spectrogram for visual purposes 
@@ -118,8 +121,6 @@ function decoded_number = decode_signal(signal)
 end
 
 
-
-
 function number = map_frequencies_to_number(f1, f2)
     row_freqs = [697, 770, 852, 941];
     col_freqs = [1209, 1336, 1477, 1633];
@@ -131,17 +132,16 @@ function number = map_frequencies_to_number(f1, f2)
     [~, col_idx] = min(abs(col_freqs - f2));
 
     % Define Grey Areas for 
-    if abs(row_freqs(row_idx) - f1) > tolerance
-        number = 'X';  % Frequency f1 was not close enough
+    if abs(row_freqs(row_idx) - f1) > tolerance 
+        number = 'ERROR';  % Frequency f1 or f2 was not within range +/- tolerance 
         return;
-    end
+    end 
     
-  
     if abs(col_freqs(col_idx) - f2) > tolerance
-        number = 'X';  % Frequency f2 was not close enough
+        number = 'ERROR';  % Frequency f1 or f2 was not within range +/- tolerance 
         return;
-    end
-
+    end 
+    
     DTMF_map = {
         '1', '2', '3', 'A';
         '4', '5', '6', 'B';
